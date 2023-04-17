@@ -141,7 +141,7 @@ server <- function(input, output) {
     eq_reta = paste0("y = ", round(a, 2), " + ", round(b, 2), "x")
 
     # Desenhando o gráfico de dispersão
-    plot(x, y, xlab = "Velocidade", ylab = "Distância", main = "Gráfico de dispersão", pch = 16)
+    plot(x, y, xlab = "Velocidade", ylab = "Distância", main = "Regressão Linear", pch = 16)
     text(7.5, 100, paste0("Equação da reta:", eq_reta))
     text(7.5, 90, paste0("R:", R))
     text(7.5, 80, paste0("R2:", R2))
