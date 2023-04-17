@@ -22,7 +22,6 @@ ui <- fluidPage(
       sliderInput("mu0", "Selecione mu0",
                   min = 4, max = 12, value = 10
       ),
-      
       sliderInput("alfa", "Selecione alfa",
                   min = 0.01, max = 0.10, value = 0.05
       )
@@ -61,6 +60,7 @@ server <- function(input, output) {
     filter(Hora > "18:40:53" & Hora < "18:45:12")
   velocidade = data_filtrada$Velocidade
   
+  variancia = reactive(input$variancia)
   n = reactive(length(velocidade))
   xbarra = reactive(mean(velocidade))
   sig = reactive(sd(velocidade))
