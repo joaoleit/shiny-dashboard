@@ -56,12 +56,12 @@ server <- function(input, output) {
   escolha_dados = renderText(dados())
   
   
-  data = read_excel("~/Dashboard/resource/dados_de_caminhada_corrida.xlsx")
-  data_filtrada = data %>%
+  dados = read_excel("~/Dashboard/resource/dados_de_caminhada_corrida.xlsx")
+  dados_filtrados = dados %>%
     separate(Velocidade, into = c("Velocidade"), sep = " ") %>%
     mutate(Hora = format(as.POSIXct(Hora, tz = "UTC"), "%T"), Velocidade = as.numeric(Velocidade)) %>%
     filter(Hora > "18:40:53" & Hora < "18:45:12")
-  velocidade = data_filtrada$Velocidade
+  velocidade = dados_filtrados$Velocidade
   
   variancia = reactive(input$variancia)
   n = reactive(length(velocidade))
@@ -120,7 +120,9 @@ server <- function(input, output) {
   })
   
   output$reg = renderPlot({
+    # Carregando a base de dados interna 'cars'
     data(cars)
+  
     # Calculando a tabela de soma
     x = cars$speed
     y = cars$dist
@@ -141,11 +143,11 @@ server <- function(input, output) {
     # Calculando a equação da reta
     b = num / (den1 ^ 2)
     a = (s_y - b * s_x) / n
-    eq_reta = paste0("y = ", round(a, 2), " + ", round(b, 2), "x")
+    equacao_reta = paste0("y = ", round(a, 2), " + ", round(b, 2), "x")
 
     # Desenhando o gráfico de dispersão
     plot(x, y, xlab = "Velocidade", ylab = "Distância", main = "Regressão Linear", pch = 16)
-    text(7.5, 100, paste0("Equação da reta:", eq_reta))
+    text(7.5, 100, paste0("Equação da reta:", equacao_reta))
     text(7.5, 90, paste0("R:", R))
     text(7.5, 80, paste0("R2:", R2))
 
@@ -187,6 +189,7 @@ server <- function(input, output) {
   })
 
   output$intervalo_confianca = renderText({
+    # Filtra os dados recebidos pelo excel
     dados = read_excel("~/Dashboard/resource/dados_de_caminhada_corrida.xlsx")
     data_filtrada = dados %>%
       separate(Velocidade, into = c("Velocidade"), sep = " ") %>%
@@ -195,6 +198,7 @@ server <- function(input, output) {
       select(Velocidade)
     velocidade = data_filtrada$Velocidade
 
+    # Calcula o alfa pelo valor recebido do nível de confiança
     nivel_de_confianca = reactive(as.numeric(input$n_confianca))
     alfa = (1 - nivel_de_confianca())
 
@@ -202,10 +206,11 @@ server <- function(input, output) {
     desvio_padrao = sd(velocidade)
     erro_padrao = desvio_padrao / sqrt(length(dados))
 
-    z_alpha = qnorm(1 - (alfa / 2))
+    # Achando o valor de Z para o valor de 1 - (alfa / 2)
+    valor_z = qnorm(1 - (alfa / 2))
 
-    limite_inferior = media - (z_alpha * erro_padrao)
-    limite_superior = media + (z_alpha * erro_padrao)
+    limite_inferior = media - (valor_z * erro_padrao)
+    limite_superior = media + (valor_z * erro_padrao)
     paste0("[", round(limite_inferior, 4), ", ", round(limite_superior, 4), "]")
   })
 }
