@@ -148,8 +148,8 @@ server <- function(input, output) {
     # Desenhando o gráfico de dispersão
     plot(x, y, xlab = "Velocidade", ylab = "Distância", main = "Regressão Linear", pch = 16)
     text(7.5, 100, paste0("Equação da reta:", equacao_reta))
-    text(7.5, 90, paste0("R:", R))
-    text(7.5, 80, paste0("R2:", R2))
+    text(7.5, 90, paste0("R:", round(R, 4)))
+    text(7.5, 80, paste0("R2:", round(R2, 4)))
 
     # Adicionando a linha de regressão
     abline(a, b, col = "red")
