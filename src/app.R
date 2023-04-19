@@ -38,7 +38,10 @@ ui <- fluidPage(
                            tableOutput('table'),
                            plotOutput('hist')
                            ),
-                  tabPanel("Intervalo de Confiança", "Nada por enquanto!"),
+                  tabPanel("Intervalo de Confiança",
+                            sliderInput("n_confianca", "Nível de Confiança", min = 0.01, max = 0.99, value = 0.95),
+                            textOutput("intervalo_confianca")
+                          ),
                   tabPanel("Regressão", plotOutput('reg'))
       )
       
@@ -181,6 +184,29 @@ server <- function(input, output) {
                 colour = "red", size =  2.5) +
       xlab("Longitude") + ylab("Latitude")
     sa_map2_plt
+  })
+
+  output$intervalo_confianca = renderText({
+    dados = read_excel("~/Dashboard/resource/dados_de_caminhada_corrida.xlsx")
+    data_filtrada = dados %>%
+      separate(Velocidade, into = c("Velocidade"), sep = " ") %>%
+      mutate(Hora = format(as.POSIXct(dados$Hora, tz = "UTC"), "%T"), Velocidade = as.numeric(Velocidade)) %>%
+      filter(Hora > "18:45:18" & Hora < "18:49:23") %>%
+      select(Velocidade)
+    velocidade = data_filtrada$Velocidade
+
+    nivel_de_confianca = reactive(as.numeric(input$n_confianca))
+    alfa = (1 - nivel_de_confianca())
+
+    media = mean(velocidade)
+    desvio_padrao = sd(velocidade)
+    erro_padrao = desvio_padrao / sqrt(length(dados))
+
+    z_alpha = qnorm(1 - (alfa / 2))
+
+    limite_inferior = media - (z_alpha * erro_padrao)
+    limite_superior = media + (z_alpha * erro_padrao)
+    paste0("[", round(limite_inferior, 4), ", ", round(limite_superior, 4), "]")
   })
 }
 
